@@ -66,13 +66,26 @@ new Vue({
       this.todoTitle = ''
     },
     removeTodo(id) {
-      fetch('/api/todo/' + id, {
-        method: 'delete'
+      const query = `
+        mutation {
+          deleteTodo(id: "${id}")
+        }
+      `
+
+      fetch('/graphql', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({query})
       })
-        .then(() => {
+      .then(res => res.json())
+      .then(response => {
+        if (response.data.deleteTodo) {
           this.todos = this.todos.filter(t => t.id !== id)
-        })
-        .catch(e => console.log(e))
+        }
+      })
     },
     completeTodo(id) {
       const query = `
